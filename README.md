@@ -48,7 +48,7 @@ agro-disease-classification/
 │       └── 03_evaluation.ipynb
 │
 ├── src/
-│   ├── config.py
+│   ├── __init__.py
 │   ├── models/
 │   │   ├── milho_model.py
 │   │   └── soja_model.py
