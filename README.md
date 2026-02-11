@@ -31,36 +31,43 @@ Com isso, o projeto busca:
 
 ## 🗂️ Estrutura do Repositório
 
-```bash
+```
 agro-disease-classification/
 │
 ├── README.md
 │
 ├── notebooks/
-│   ├── 01_data_preparation.ipynb      # Organização e preparação do dataset
-│   ├── 02_training_mlflow.ipynb        # Treinamento e experimentação com MLflow
-│   └── 03_evaluation.ipynb             # Avaliação final dos modelos
+│   ├── milho/
+│   │   ├── 01_data_preparation.ipynb
+│   │   ├── 02_training_mlflow.ipynb
+│   │   └── 03_evaluation.ipynb
+│   │
+│   └── soja/
+│       ├── 01_data_preparation.ipynb
+│       ├── 02_training_mlflow.ipynb
+│       └── 03_evaluation.ipynb
 │
 ├── src/
-│   ├── __init__.py
-│   ├── config.py                       # Parâmetros globais e paths
-│   ├── preprocessing.py               # Transformações e data augmentation
-│   ├── dataset.py                     # Dataset e DataLoader
-│   ├── model.py                       # Arquiteturas de modelos
-│   ├── train.py                       # Loop de treino (agnóstico a experimento)
-│   ├── evaluate.py                    # Métricas e avaliação
-│   └── inference.py                   # Inferência para produção
-│
-├── mlflow/
-│   └── README.md                      # Organização dos experimentos
-│
-├── scripts/
-│   ├── register_model.py              # Registro de modelo vencedor
-│   └── batch_inference.py             # Inferência em lote
+│   ├── config.py
+│   ├── models/
+│   │   ├── milho_model.py
+│   │   └── soja_model.py
+│   │
+│   ├── preprocessing/
+│   │   ├── milho_preprocessing.py
+│   │   └── soja_preprocessing.py
+│   │
+│   ├── dataset/
+│   │   ├── milho_dataset.py
+│   │   └── soja_dataset.py
+│   │
+│   ├── train.py
+│   ├── evaluate.py
+│   └── inference.py
 │
 └── docs/
-    ├── architecture.md                # Arquitetura do projeto
-    └── experiment_tracking.md         # Estratégia de experimentos
+    ├── architecture.md
+    └── experiment_tracking.md
 ```
 
 ---
