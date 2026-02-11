@@ -17,7 +17,7 @@ from torchvision import datasets, transforms
 # 1️⃣ EXTRAÇÃO DO DATASET (se necessário)
 # ==========================================================
 
-def extrair_dataset(zip_path, extract_path):
+def extrair_dataset_milho(zip_path, extract_path):
     """
     Extrai o dataset apenas se a pasta ainda não existir.
     """
@@ -56,7 +56,7 @@ def dataset_ja_dividido(caminho_dividido):
 # 3️⃣ FUNÇÃO DE SPLIT
 # ==========================================================
 
-def organizar_dataset(
+def organizar_dataset_milho(
     caminho_dados_originais,
     caminho_dados_divididos,
     test_size=0.3,
@@ -131,7 +131,7 @@ def organizar_dataset(
 # 4️⃣ TRANSFORMS (DATA AUGMENTATION)
 # ==========================================================
 
-def get_transforms():
+def get_transforms_milho():
 
     transformacoes_treino = transforms.Compose([
         transforms.RandomResizedCrop(224),
@@ -144,7 +144,7 @@ def get_transforms():
         )
     ])
 
-    transformacoes_teste = transforms.Compose([
+    transformacoes_teste_val = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
         transforms.Normalize(
@@ -153,54 +153,75 @@ def get_transforms():
         )
     ])
 
-    return transformacoes_treino, transformacoes_teste
+    return transformacoes_treino, transformacoes_teste_val
 
 
 # ==========================================================
 # 5️⃣ DATALOADERS
 # ==========================================================
 
-def criar_dataloaders(caminho_dados_divididos, batch_size=32):
+def criar_dataloaders_milho(caminho_dados_divididos, batch_size=32):
 
-    transform_treino, transform_teste = get_transforms()
+    try:
+        # Verifica se diretórios existem
+        for split in ["train", "val", "test"]:
+            caminho_split = os.path.join(caminho_dados_divididos, split)
+            if not os.path.exists(caminho_split):
+                raise FileNotFoundError(f"Pasta não encontrada: {caminho_split}")
 
-    dados_treino = datasets.ImageFolder(
-        root=os.path.join(caminho_dados_divididos, "train"),
-        transform=transform_treino
-    )
+        transform_treino, transform_teste_val = get_transforms_milho()
 
-    dados_validacao = datasets.ImageFolder(
-        root=os.path.join(caminho_dados_divididos, "val"),
-        transform=transform_teste
-    )
+        dados_treino = datasets.ImageFolder(
+            root=os.path.join(caminho_dados_divididos, "train"),
+            transform=transform_treino
+        )
 
-    dados_teste = datasets.ImageFolder(
-        root=os.path.join(caminho_dados_divididos, "test"),
-        transform=transform_teste
-    )
+        dados_validacao = datasets.ImageFolder(
+            root=os.path.join(caminho_dados_divididos, "val"),
+            transform=transform_teste_val
+        )
 
-    loader_treino = DataLoader(
-        dados_treino,
-        batch_size=batch_size,
-        shuffle=True,
-        num_workers=2,
-        pin_memory=True
-    )
+        dados_teste = datasets.ImageFolder(
+            root=os.path.join(caminho_dados_divididos, "test"),
+            transform=transform_teste_val
+        )
 
-    loader_validacao = DataLoader(
-        dados_validacao,
-        batch_size=batch_size,
-        shuffle=False,
-        num_workers=2,
-        pin_memory=True
-    )
+        # Verifica se existem imagens
+        if len(dados_treino) == 0:
+            raise ValueError("Dataset de treino está vazio.")
+        if len(dados_validacao) == 0:
+            raise ValueError("Dataset de validação está vazio.")
+        if len(dados_teste) == 0:
+            raise ValueError("Dataset de teste está vazio.")
 
-    loader_teste = DataLoader(
-        dados_teste,
-        batch_size=batch_size,
-        shuffle=False,
-        num_workers=2,
-        pin_memory=True
-    )
+        loader_treino = DataLoader(
+            dados_treino,
+            batch_size=batch_size,
+            shuffle=True,
+            num_workers=2,
+            pin_memory=True
+        )
 
-    return loader_treino, loader_validacao, loader_teste
+        loader_validacao = DataLoader(
+            dados_validacao,
+            batch_size=batch_size,
+            shuffle=False,
+            num_workers=2,
+            pin_memory=True
+        )
+
+        loader_teste = DataLoader(
+            dados_teste,
+            batch_size=batch_size,
+            shuffle=False,
+            num_workers=2,
+            pin_memory=True
+        )
+
+        print("DataLoaders criados com sucesso!")
+
+        return loader_treino, loader_validacao, loader_teste
+
+    except Exception as e:
+        print(f"Erro ao criar DataLoaders: {e}")
+        return None, None, None
