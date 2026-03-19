@@ -1,21 +1,13 @@
-# ==========================================================
-# PREPROCESSAMENTO - DATASET MILHO
-# Split + Data Augmentation + DataLoaders
-# ==========================================================
-
 import os
 import shutil
 import zipfile
 from sklearn.model_selection import train_test_split
 
 import torch
-from torch.utils.data import DataLoader
-from torchvision import datasets, transforms
+from torchvision import transforms
 
 
-# ==========================================================
-# 1️⃣ EXTRAÇÃO DO DATASET (se necessário)
-# ==========================================================
+# EXTRAÇÃO DO DATASET (se necessário)
 
 def extrair_dataset_milho(zip_path, extract_path):
     """
@@ -31,9 +23,7 @@ def extrair_dataset_milho(zip_path, extract_path):
     print("Dataset extraído com sucesso!")
 
 
-# ==========================================================
-# 2️⃣ VERIFICAÇÃO SE O SPLIT JÁ EXISTE
-# ==========================================================
+# VERIFICAÇÃO SE O SPLIT JÁ EXISTE
 
 def dataset_ja_dividido(caminho_dividido):
     """
@@ -52,9 +42,7 @@ def dataset_ja_dividido(caminho_dividido):
     return True
 
 
-# ==========================================================
-# 3️⃣ FUNÇÃO DE SPLIT
-# ==========================================================
+# FUNÇÃO DE SPLIT
 
 def organizar_dataset_milho(
     caminho_dados_originais,
@@ -127,9 +115,7 @@ def organizar_dataset_milho(
     print("Dataset organizado com sucesso!")
 
 
-# ==========================================================
-# 4️⃣ TRANSFORMS (DATA AUGMENTATION)
-# ==========================================================
+# TRANSFORMS (DATA AUGMENTATION)
 
 def get_transforms_milho():
 
@@ -154,74 +140,3 @@ def get_transforms_milho():
     ])
 
     return transformacoes_treino, transformacoes_teste_val
-
-
-# ==========================================================
-# 5️⃣ DATALOADERS
-# ==========================================================
-
-def criar_dataloaders_milho(caminho_dados_divididos, batch_size=32):
-
-    try:
-        # Verifica se diretórios existem
-        for split in ["train", "val", "test"]:
-            caminho_split = os.path.join(caminho_dados_divididos, split)
-            if not os.path.exists(caminho_split):
-                raise FileNotFoundError(f"Pasta não encontrada: {caminho_split}")
-
-        transform_treino, transform_teste_val = get_transforms_milho()
-
-        dados_treino = datasets.ImageFolder(
-            root=os.path.join(caminho_dados_divididos, "train"),
-            transform=transform_treino
-        )
-
-        dados_validacao = datasets.ImageFolder(
-            root=os.path.join(caminho_dados_divididos, "val"),
-            transform=transform_teste_val
-        )
-
-        dados_teste = datasets.ImageFolder(
-            root=os.path.join(caminho_dados_divididos, "test"),
-            transform=transform_teste_val
-        )
-
-        # Verifica se existem imagens
-        if len(dados_treino) == 0:
-            raise ValueError("Dataset de treino está vazio.")
-        if len(dados_validacao) == 0:
-            raise ValueError("Dataset de validação está vazio.")
-        if len(dados_teste) == 0:
-            raise ValueError("Dataset de teste está vazio.")
-
-        loader_treino = DataLoader(
-            dados_treino,
-            batch_size=batch_size,
-            shuffle=True,
-            num_workers=2,
-            pin_memory=True
-        )
-
-        loader_validacao = DataLoader(
-            dados_validacao,
-            batch_size=batch_size,
-            shuffle=False,
-            num_workers=2,
-            pin_memory=True
-        )
-
-        loader_teste = DataLoader(
-            dados_teste,
-            batch_size=batch_size,
-            shuffle=False,
-            num_workers=2,
-            pin_memory=True
-        )
-
-        print("DataLoaders criados com sucesso!")
-
-        return loader_treino, loader_validacao, loader_teste
-
-    except Exception as e:
-        print(f"Erro ao criar DataLoaders: {e}")
-        return None, None, None

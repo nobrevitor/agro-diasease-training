@@ -83,7 +83,7 @@ def get_efficientnet_b0(num_classes, freeze_backbone=True):
     return model
 
 
-# -------- DenseNet121 --------
+# DenseNet121
 def get_densenet121(num_classes, freeze_backbone=True):
     model = models.densenet121(
         weights=models.DenseNet121_Weights.DEFAULT
@@ -98,9 +98,7 @@ def get_densenet121(num_classes, freeze_backbone=True):
     return model
 
 
-# =====================================================
-# 3️⃣ FUNÇÃO CENTRAL PARA PIPELINE / MLFLOW
-# =====================================================
+#  FUNÇÃO CENTRAL PARA PIPELINE / MLFLOW
 
 def get_model(model_name, num_classes, freeze_backbone=True):
     model_name = model_name.lower()
