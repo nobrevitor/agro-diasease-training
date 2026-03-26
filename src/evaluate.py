@@ -1,6 +1,16 @@
 import torch
-from sklearn.metrics import accuracy_score, classification_report
+import numpy as np
 
+from sklearn.metrics import (
+    accuracy_score,
+    classification_report,
+    confusion_matrix
+)
+
+
+# --------------------------------------------------
+# FUNÇÃO BASE: GERA PREDIÇÕES
+# --------------------------------------------------
 def get_predictions(model, loader, device):
 
     model.eval()
@@ -13,30 +23,35 @@ def get_predictions(model, loader, device):
             labels = labels.to(device)
 
             outputs = model(images)
-            _, preds = torch.max(outputs, 1)
+            preds = torch.argmax(outputs, dim=1)
 
             all_preds.extend(preds.cpu().numpy())
             all_labels.extend(labels.cpu().numpy())
 
-    return all_labels, all_preds
-    
-def evaluate_model(model, test_loader, device):
+    return np.array(all_labels), np.array(all_preds)
 
-    model.eval()
-    all_preds = []
-    all_labels = []
 
-    with torch.no_grad():
-        for images, labels in test_loader:
-            images = images.to(device)
+# --------------------------------------------------
+# FUNÇÃO DE AVALIAÇÃO COMPLETA
+# --------------------------------------------------
+def evaluate_model(model, loader, device, class_names=None):
 
-            outputs = model(images)
-            _, preds = torch.max(outputs, 1)
+    y_true, y_pred = get_predictions(model, loader, device)
 
-            all_preds.extend(preds.cpu().numpy())
-            all_labels.extend(labels.numpy())
+    acc = accuracy_score(y_true, y_pred)
 
-    accuracy = accuracy_score(all_labels, all_preds)
-    report = classification_report(all_labels, all_preds)
+    report = classification_report(
+        y_true,
+        y_pred,
+        target_names=class_names
+    )
 
-    return accuracy, report
+    cm = confusion_matrix(y_true, y_pred)
+
+    return {
+        "accuracy": acc,
+        "classification_report": report,
+        "confusion_matrix": cm,
+        "y_true": y_true,
+        "y_pred": y_pred
+    }
