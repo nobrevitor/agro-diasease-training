@@ -36,6 +36,28 @@ agro-disease-classification/
 │
 ├── README.md
 │
+├── api/
+|   ├── app/
+|   |   └── main.py
+|   |
+|   ├── functions/
+|   |   ├── model.py
+|   |   ├── preprocessing.py
+|   |   └── schema.py
+|   |
+|   ├── models/
+|   |   ├── modelo_milho_doencas_pyfunc/
+|   |   |   └── MLmodel
+|   |   └── modelo_soja_doencas_pyfunc/
+|   |       └── MLmodel
+|   |
+|   ├── src/
+|   |   └── models/
+|   |       └── milho_models.py
+|   |
+|   ├── requirements.txt
+|   └── Dockerfile
+|    
 ├── notebooks/
 │   ├── milho/
 │   │   ├── 01_data_preparation.ipynb
@@ -47,27 +69,21 @@ agro-disease-classification/
 │       ├── 02_training_mlflow.ipynb
 │       └── 03_evaluation.ipynb
 │
-├── src/
-│   ├── __init__.py
-│   ├── models/
-│   │   ├── milho_model.py
-│   │   └── soja_model.py
-│   │
-│   ├── preprocessing/
-│   │   ├── milho_preprocessing.py
-│   │   └── soja_preprocessing.py
-│   │
-│   ├── dataset/
-│   │   ├── milho_dataset.py
-│   │   └── soja_dataset.py
-│   │
-│   ├── train.py
-│   ├── evaluate.py
-│   └── inference.py
-│
-└── docs/
-    ├── architecture.md
-    └── experiment_tracking.md
+└── src/
+    ├── dataset/
+    │   ├── milho_dataset.py
+    │   └── soja_dataset.py
+    |
+    ├── models/
+    │   ├── milho_model.py
+    │   └── soja_model.py
+    │
+    ├── preprocessing/
+    │   ├── milho_preprocessing.py
+    │   └── soja_preprocessing.py
+    │
+    ├── train.py
+    └── evaluate.py
 ```
 
 ---
@@ -94,12 +110,12 @@ O projeto está preparado para produção utilizando:
 
 * **FastAPI** → Servir o modelo como API REST
 * **Render** → Hospedagem gratuita do backend
-* **React** → Interface para upload de imagens
+* **Streamlit** → Interface para upload de imagens
 
 Fluxo previsto:
 
 ```text
-Usuário → React → FastAPI → Modelo → Predição
+Usuário → Streamlit → FastAPI → Modelo → Predição
 ```
 
 ---
@@ -113,7 +129,7 @@ Usuário → React → FastAPI → Modelo → Predição
 * MLflow
 * Databricks (Free Edition)
 * FastAPI
-* React
+* Streamlit
 
 ---
 
