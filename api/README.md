@@ -62,6 +62,8 @@ e use o start command:
 uvicorn app.main:app --host 0.0.0.0 --port $PORT
 ```
 
+
+
 ## Posso usar só o código da pasta `src`?
 
 Curto: **não para inferência em produção**.
