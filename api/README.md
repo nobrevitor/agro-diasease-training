@@ -1,74 +1,78 @@
-# Agro Disease Detection API
+# Agro Disease API (FastAPI)
 
-## Objetivo: 
+API de inferência para classificação de doenças em folhas de milho.
 
-O projeto tem como objetivo desenvolver uma solução de deep learning capaz de identificar doenças agrícolas em grãos de diferentes culturas. A aplicação permite compreender com precisão qual doença está afetando a plantação, apoiando a tomada de decisões mais inteligentes no manejo agrícola.
+## Estrutura da pasta `api`
 
-Com a identificação correta da doença, torna-se possível utilizar defensivos agrícolas de forma direcionada e eficiente, reduzindo o uso excessivo desses insumos. Essa abordagem contribui para a diminuição dos custos de produção, ao mesmo tempo em que minimiza os impactos ambientais causados pelo uso indiscriminado de defensivos.
-
-Dessa forma, o projeto promove ganhos econômicos para os agricultores e reforça práticas agrícolas mais sustentáveis, aliando produtividade à preservação do meio ambiente.
-
-Este projeto implementa uma arquitetura de MLOps para detecção de doenças agrícolas utilizando modelos de Redes Neurais Convolucionais (CNNs) especializados por cultura.
-
-Atualmente, o sistema suporta:
-
-🌽 Milho
-
-🌱 Soja
-
-## Arquitetura do Projeto:
-
-O projeto foi dividido em três camadas principais:
-
-#### 1. Treinamento e Versionamento:
-
-- Realizado no Databricks Free Edition
-- Utilização do MLflow para rastreamento de experimentos e métricas
-- Seleção do melhor modelo por desempenho
-- Exportação do melhor modelo e versionamento do artefato dentro deste repositório para inferência local
-
-#### 2. Serviço de Inferência:
-
-- API construída com FastAPI
-- Deploy realizado no Render
-- Carregamento do modelo a partir do diretório local (`MODEL_MILHO_PATH`, padrão: `models/modelo_milho_doencas_pyfunc`)
-- Endpoints REST para inferência em tempo real
-
-##### Onde salvar o modelo local?
-
-- **Não é obrigatório salvar dentro de `app/` ou `functions/`**.
-- O caminho padrão esperado é `models/modelo_milho_doencas_pyfunc` (na raiz do projeto).
-- Você pode salvar em qualquer pasta e configurar via variável de ambiente:
-
-```bash
-MODEL_MILHO_PATH=models/meu_modelo
+```text
+api/
+├── app/
+│   └── main.py                  # Endpoints FastAPI
+├── functions/
+│   ├── model.py                 # Carregamento do modelo MLflow local
+│   ├── preprocessing.py         # Pré-processamento da imagem
+│   └── schema.py                # Schemas de resposta
+├── models/
+│   └── modelo_milho_doencas_pyfunc/
+│       └── MLmodel              # Artefato MLflow versionado no repo
+├── requirements.txt
+└── Dockerfile
 ```
 
-- O diretório precisa ser um artefato MLflow válido (com arquivo `MLmodel`).
+## Endpoints
 
-#### 3. Interface de Usuário
+- `GET /health` → status da API
+- `GET /health?check_model=true` → status + valida carregamento do modelo
+- `POST /predict` → predição a partir de upload de imagem
 
-- Aplicação Streamlit consumindo a API
-- Upload de imagens e visualização dos resultados
+### Exemplo de uso (`/predict`)
 
-## Endpoints disponíveis: 
+```bash
+curl -X POST \
+  -F "file=@folha.jpg" \
+  http://localhost:8000/predict
+```
 
-Milho
-POST /predict/milho
+Resposta esperada:
 
-Soja
-POST /predict/soja
+```json
+{
+  "prediction": "Common Rust",
+  "confidence": 0.97
+}
+```
 
+## Rodando localmente
 
-Input: imagem da folha
-Output: classe predita da doença
+Na raiz de `api/`:
 
-## Tecnologias Utilizadas:
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
 
-- Python
-- PyTorch
-- FastAPI
-- MLflow
-- Databricks
-- Render
-- Streamlit
+## Deploy no Render (monorepo)
+
+No Render, configure o serviço Python apontando para a pasta `api` como Root Directory
+e use o start command:
+
+```bash
+uvicorn app.main:app --host 0.0.0.0 --port $PORT
+```
+
+## Posso usar só o código da pasta `src`?
+
+Curto: **não para inferência em produção**.
+
+- A pasta `src` define arquitetura e pipeline, mas **não substitui o modelo treinado**.
+- Para a API prever corretamente, você precisa de um artefato com os pesos (checkpoint/MLflow model).
+- Nesta API, o carregamento espera um diretório MLflow válido (com arquivo `MLmodel`).
+
+Nesta API, o caminho do modelo é fixo e simples:
+
+- `api/models/modelo_milho_doencas_pyfunc`
+
+Isso ajuda a evitar confusão e facilita manutenção para quem está começando.
+

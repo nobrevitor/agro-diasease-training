@@ -1,51 +1,37 @@
 import logging
-import os
 from pathlib import Path
 
 import mlflow.pyfunc
 
 logger = logging.getLogger(__name__)
 
-model_milho = None
+_model_milho = None
+_MODEL_DIR = Path(__file__).resolve().parent.parent / "models" / "modelo_milho_doencas_pyfunc"
 
-DEFAULT_MODEL_PATH = "models/modelo_milho_doencas_pyfunc"
 
-def _resolve_model_path() -> Path:
-    model_path = os.getenv("MODEL_MILHO_PATH", DEFAULT_MODEL_PATH).strip()
-    if not model_path:
-        raise RuntimeError("MODEL_MILHO_PATH está vazio.")
+def _load_model_milho():
+    if not _MODEL_DIR.exists():
+        raise RuntimeError(f"Modelo não encontrado em: {_MODEL_DIR}")
 
-    path = Path(model_path)
-    if not path.is_absolute():
-        path = Path(__file__).resolve().parent.parent / path
-
-    if not path.exists():
+    if not (_MODEL_DIR / "MLmodel").exists():
         raise RuntimeError(
-            f"Modelo local não encontrado em '{path}'. "
-            "Salve o artefato no repositório ou ajuste MODEL_MILHO_PATH."
+            f"A pasta do modelo não é um artefato MLflow válido: {_MODEL_DIR}"
         )
 
-    if path.is_dir() and not (path / "MLmodel").exists():
-        raise RuntimeError(
-            f"O diretório '{path}' não parece ser um modelo MLflow válido "
-            "(arquivo 'MLmodel' não encontrado)."
-        )
-
-    return path
+    try:
+        return mlflow.pyfunc.load_model(_MODEL_DIR.as_uri())
+    except Exception as exc:
+        raise RuntimeError(f"Erro ao carregar modelo de milho: {exc}") from exc
 
 
-def get_model(nome_modelo):
-    global model_milho
+def get_model(nome_modelo: str):
+    global _model_milho
 
     if nome_modelo != "milho":
         raise RuntimeError(f"Modelo '{nome_modelo}' não encontrado")
 
-    if model_milho is None:
-        try:
-            model_path = _resolve_model_path()
-            model_milho = mlflow.pyfunc.load_model(model_path.as_uri())
-            logger.info("Modelo de milho carregado com sucesso de '%s'.", model_path)
-        except Exception as exc:
-            raise RuntimeError(f"Falha ao carregar modelo local: {exc}") from exc
+    if _model_milho is None:
+        _model_milho = _load_model_milho()
+        logger.info("Modelo de milho carregado com sucesso de '%s'.", _MODEL_DIR)
 
-    return model_milho
+    return _model_milho
