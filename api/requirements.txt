@@ -1,10 +1,15 @@
-fastapi == 0.128.0
-uvicorn == 0.40.0
-pillow == 11.1.0
-torch == 2.11.0+cpu
-torchvision == 0.26.0+cpu
-mlflow == 2.22.0
-pydantic == 2.10.6
-numpy == 2.1.3
-pandas == 2.2.3
-python-multipart == 0.0.20
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+fastapi==0.115.12
+uvicorn[standard]==0.34.2
+python-multipart==0.0.20
+pydantic==2.11.3
+
+mlflow==2.22.0
+numpy==2.1.3
+pandas==2.2.3
+pillow==11.1.0
+
+# CPU-only wheels for Render free instances
+torch==2.5.1+cpu
+torchvision==0.20.1+cpu
