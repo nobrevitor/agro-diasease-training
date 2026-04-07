@@ -6,7 +6,7 @@ Atualmente, o projeto contempla modelos independentes para **milho** e **soja**,
 
 ---
 
-## 🎯 Objetivo
+## Objetivo
 
 Desenvolver uma solução baseada em **Redes Neurais Convolucionais (CNNs)** capaz de identificar doenças agrícolas a partir de imagens, apoiando a **tomada de decisão inteligente no campo**.
 
@@ -19,7 +19,7 @@ Com isso, o projeto busca:
 
 ---
 
-## 🧠 Abordagem Técnica
+## Abordagem Técnica
 
 * Modelos independentes por cultura (ex: milho e soja)
 * Treinamento supervisionado com imagens rotuladas
@@ -87,6 +87,17 @@ agro-disease-classification/
 ```
 
 ---
+
+## Tratamento de Overfitting (Modelo de Soja)
+
+Durante a fase de validação do modelo de soja, identificamos um cenário de overfitting (sobreajuste). O problema foi detectado ao submeter o modelo a um dataset de teste externo, previamente limpo e normalizado, onde a performance foi significativamente inferior aos dados de treino.Para mitigar esse problema e melhorar a generalização do modelo, aplicamos as seguintes estratégias:
+
+Ajuste de Hiperparâmetros: Refinamos a taxa de aprendizado (LR ou Learning Rate) para permitir uma convergência mais estável e evitar que o modelo ficasse "preso" em mínimos locais de ruído dos dados de treino. 
+
+Data Augmentation Estratégico: 
+    Classes Minoritárias: Aplicamos um aumento agressivo de dados (rotações, flips, ajustes de brilho e contraste) para equilibrar a representatividade dessas classes.
+    Classes Majoritárias: Reduzimos drasticamente o volume de dados e a intensidade das transformações para evitar que o modelo se tornasse tendencioso (bias) para as classes com mais amostras.
+    Validação Cruzada: O loop de teste foi reestruturado para garantir que a normalização dos dados de produção fosse idêntica à do treinamento.
 
 ## 🔬 Experimentos e MLflow
 
