@@ -99,7 +99,7 @@ Data Augmentation Estratégico:
     Classes Majoritárias: Reduzimos drasticamente o volume de dados e a intensidade das transformações para evitar que o modelo se tornasse tendencioso (bias) para as classes com mais amostras.
     Validação Cruzada: O loop de teste foi reestruturado para garantir que a normalização dos dados de produção fosse idêntica à do treinamento.
 
-## 🔬 Experimentos e MLflow
+## Experimentos e MLflow
 
 Os experimentos são definidos **fora da lógica de treino**, permitindo:
 
@@ -115,7 +115,7 @@ Cada experimento registra:
 
 ---
 
-## 🚀 Deploy (Roadmap)
+## Deploy (Roadmap)
 
 O projeto está preparado para produção utilizando:
 
@@ -131,7 +131,7 @@ Usuário → Streamlit → FastAPI → Modelo → Predição
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 * Python
 * PyTorch
